@@ -208,7 +208,7 @@ module.exports = (shepherd) => {
                 '-ac_timeunlockto=1180800',
                 '-ac_veruspos=50',
                 '-gen',
-                '-genproclimit=3'
+                '-genproclimit=0'
             ]
         };
 
