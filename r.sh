@@ -1,5 +1,5 @@
 #!/bin/bash
-./binary_artifacts.sh
+./binary_artifacts.sh || true
 npm install electron-packager -g || sudo npm install electron-packager -g
 npm install electron -g --unsafe-perm=true
 npm install && npm install webpack webpack-dashboard
