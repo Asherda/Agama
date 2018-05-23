@@ -58,7 +58,7 @@ before-install:
 install:
   - echo $GCLOUD_KEY > ./GC-Auth.json
   - gcloud auth activate-service-account --key-file GC-Auth.json
-  - gsutil cp -r gs://$BUCKET/$PROJECT/$TRAVIS_BRANCH/$KOMODO_VARIANT/ .
+  - gsutil cp -r gs://$BUCKET/$ARTIFACTS/$TRAVIS_BRANCH/$KOMODO_VARIANT/ .
   - ls $KOMODO_VARIANT
   - tar -xzvf VerusCoin_$TRAVIS_BRANCH_$KOMODO_VARIANT_komodo-build.tar
   - if [ -n "$PACKAGES" ]; then sudo rm -f /etc/apt/sources.list.d/travis_ci_zeromq3-source.list; fi
@@ -73,7 +73,7 @@ install:
   - cd ../../.. && yarn add webpack
   - echo $GCLOUD_KEY > ./GC-Auth.json
   - gcloud auth activate-service-account --key-file GC-Auth.json
-  - gsutil cp -r gs://$BUCKET/$PROJECT/$TRAVIS_BRANCH/$KOMODO_VARIANT/ .
+  - gsutil cp -r gs://$BUCKET/$ARTIFACTS/$TRAVIS_BRANCH/$KOMODO_VARIANT/ .
   - ls $KOMODO_VARIANT
   - tar -xzvf VerusCoin_$TRAVIS_BRANCH_$KOMODO_VARIANT_komodo-build.tar
   - cp -rvf komodo-build/* assets/bin/$ASSETS_DIR
@@ -86,6 +86,6 @@ script:
     - if [ $TARGET_PLATFORM = win32 ]; then cd build && zip -r -q -T -m $APP_NAME Agama-win32-x64; fi
 
 after_script:
-    - gsutil cp $APP_NAME gs://veruscoin/Agama/$TRAVIS_BRANCH/$TARGET_PLATFORM/
+    - gsutil cp $APP_NAME gs://$BUCKET/$PROJECT/$TRAVIS_BRANCH/$TARGET_PLATFORM/
 
 
