@@ -56,11 +56,6 @@ before-install:
   - source /home/travis/google-cloud-sdk/path.bash.inc
 
 install:
-  - echo $GCLOUD_KEY > ./GC-Auth.json
-  - gcloud auth activate-service-account --key-file GC-Auth.json
-  - gsutil cp -r gs://$BUCKET/$ARTIFACTS/$TRAVIS_BRANCH/$KOMODO_VARIANT/ .
-  - ls $KOMODO_VARIANT
-  - tar -xzvf $KOMODO_VARIANT/Komodo-build.tar.gz
   - if [ -n "$PACKAGES" ]; then sudo rm -f /etc/apt/sources.list.d/travis_ci_zeromq3-source.list; fi
   - if [ -n "$PACKAGES" ]; then sudo dpkg --add-architecture i386 && wget -nc https://dl.winehq.org/wine-builds/Release.key;fi
   - if [ -n "$PACKAGES" ]; then sudo apt-key add Release.key; fi
@@ -71,12 +66,9 @@ install:
   - cd gui/EasyDEX-GUI && yarn install && yarn add webpack webpack-dashboard
   - cd react && yarn install && yarn run build
   - cd ../../.. && yarn add webpack
-  - echo $GCLOUD_KEY > ./GC-Auth.json
-  - gcloud auth activate-service-account --key-file GC-Auth.json
   - gsutil cp -r gs://$BUCKET/$ARTIFACTS/$TRAVIS_BRANCH/$KOMODO_VARIANT/ .
-  - ls $KOMODO_VARIANT
-  - tar -xzvf $ARTIFACTS_$TRAVIS_BRANCH_$KOMODO_VARIANT_komodo-build.tar
-  - cp -rvf komodo-build/* assets/bin/$ASSETS_DIR
+  - tar -xzvf $KOMODO_VARIANT/Komodo-build.tar.gz
+  - cp -rvf $KOMODO_VARIANT/komodo-build/* assets/bin/$ASSETS_DIR
   - yarn install
 
 script:
