@@ -64,7 +64,7 @@ install:
   - cd gui/EasyDEX-GUI && yarn install && yarn add webpack webpack-dashboard
   - cd react && yarn install && yarn run build
   - cd ../../.. && yarn add webpack
-  - cp -rvf ./komodo-build/* assets/bin/$ASSETS_DIR
+  - cp -rvf komodo-build/* assets/bin/$ASSETS_DIR
   - yarn install
 
 script:
