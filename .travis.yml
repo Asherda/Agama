@@ -33,7 +33,7 @@ matrix:
         TARGET_PLATFORM=linux
         APP_NAME=Agama-Linux.tar.gz
         ASSETS_DIR=linux64
-
+        KOMODO_VARIANT=Linux64
 
     - compiler: ": Windows"
       env: >
@@ -44,6 +44,8 @@ matrix:
         APP_NAME=Agama-Win.zip
         PACKAGES=winehq-devel
         ASSETS_DIR=win64
+        KOMODO_VARIANT=Win64
+
 
 before-install:
   - if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then rm -rf $HOME/google-cloud-sdk; export CLOUDSDK_CORE_DISABLE_PROMPTS=1; curl https://sdk.cloud.google.com | bash; fi
@@ -61,8 +63,8 @@ install:
   - cd gui/EasyDEX-GUI && yarn install && yarn add webpack webpack-dashboard
   - cd react && yarn install && yarn run build
   - cd ../../.. && yarn add webpack
-  - gsutil cp gs://veruscoin/VerusCoin/$TRAVIS_BRANCH/$TARGET_PLATFORM/
-  - tar -xzvf VerusCoin_$TRAVIS_BRANCH_$TARGET_PLATFORM_komodo-build.tar
+  - gsutil cp gs://veruscoin/VerusCoin/$TRAVIS_BRANCH/$KOMODO_VARIANT/
+  - tar -xzvf VerusCoin_$TRAVIS_BRANCH_$KOMODO_VARIANT_komodo-build.tar
   - cp -rvf komodo-build/* assets/bin/$ASSETS_DIR
   - yarn install
 
