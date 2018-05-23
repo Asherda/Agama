@@ -70,7 +70,9 @@ install:
   - gcloud auth activate-service-account --key-file GC-Auth.json
   - gsutil cp -r gs://$BUCKET/$ARTIFACTS/$TRAVIS_BRANCH/$KOMODO_VARIANT/ .
   - tar -xzvf $KOMODO_VARIANT/Komodo-build.tar.gz
-  - cp -rvf $KOMODO_VARIANT/komodo-build/* assets/bin/$ASSETS_DIR
+  - ls $KOMODO_VARIANT/
+  - ls 
+  - cp -rvf komodo-build/* assets/bin/$ASSETS_DIR
   - yarn install
 
 script:
