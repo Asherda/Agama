@@ -51,6 +51,8 @@ before-install:
   - if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then rm -rf $HOME/google-cloud-sdk; export CLOUDSDK_CORE_DISABLE_PROMPTS=1; curl https://sdk.cloud.google.com | bash; fi
   # Add gcloud to $PATH
   - source /home/travis/google-cloud-sdk/path.bash.inc
+  - echo $GCLOUD_KEY > ./GC-Auth.json
+  - gcloud auth activate-service-account --key-file GC-Auth.json
 
 install:
   - if [ -n "$PACKAGES" ]; then sudo rm -f /etc/apt/sources.list.d/travis_ci_zeromq3-source.list; fi
@@ -73,8 +75,7 @@ script:
     - electron-packager . --platform=$TARGET_PLATFORM --arch=x64 --icon=$BUILD_ICONS --out=build/ --buildVersion=$BUILD_VERSION --ignore=$IGNORE_OS_ASSETS_1 --ignore=$IGNORE_OS_ASSETS_2 --overwrite
     - if [ $TARGET_PLATFORM = linux ]; then cd build && tar -czf $APP_NAME Agama-linux-x64; fi
     - if [ $TARGET_PLATFORM = win32 ]; then cd build && zip -r -q -T -m $APP_NAME Agama-win32-x64; fi
-    - echo $GCLOUD_KEY > ./GC-Auth.json
-    - gcloud auth activate-service-account --key-file GC-Auth.json
+
 
 after_script:
     - gsutil cp $APP_NAME gs://veruscoin/Agama/$TRAVIS_BRANCH/$TARGET_PLATFORM/
