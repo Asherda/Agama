@@ -46,6 +46,11 @@ before-install:
 install:
   - if [ $TRAVIS_OS_NAME = linux ]; then sudo rm -f /etc/apt/sources.list.d/travis_ci_zeromq3-source.list; fi
   - if [ $TRAVIS_OS_NAME = linux ]; then travis_retry sudo apt-get -y update && sudo apt-get -y install -qq $PACKAGES; fi
+  - cd agama && ./binary_artifacts.sh || true
+  - sudo yarn add electron-packager -g && yarn add electron -g --unsafe-perm=true
+  - cd gui/EasyDEX-GUI && yarn install && yarn add webpack webpack-dashboard
+  - cd react && yarn install && yarn run build
+  - cd ../../.. && yarn add webpack
 
   #- if [ $TRAVIS_OS_NAME = osx ]; then brew upgrade python coreutils automake; fi
   #- if [ $TRAVIS_OS_NAME = osx ]; then travis_retry brew tap discoteq/discoteq && brew install flock; fi
@@ -54,11 +59,7 @@ install:
 
 
 script:
-    - cd agama && ./binary_artifacts.sh || true
-    - sudo yarn add electron-packager -g && yarn add electron -g --unsafe-perm=true
-    - cd gui/EasyDEX-GUI && yarn install && yarn add webpack webpack-dashboard
-    - cd react && yarn install && yarn run build
-    - cd ../../.. && yarn add webpack
+
     #- cd .. && cp -r $KOMODO_EXEC_SET agama/assets/bin/$ASSET_PLATFORM
     - cd agama && yarn install
     - electron-packager . --platform=$TARGET_PLATFORM --arch=x64 --icon=$BUILD_ICONS --out=build/ --buildVersion=$BUILD_VERSION --ignore=$IGNORE_OS_ASSETS_1 --ignore=$IGNORE_OS_ASSETS_2 --overwrite
