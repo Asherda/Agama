@@ -68,7 +68,7 @@ install:
   - cd ../../.. && yarn add webpack
   - echo $GCLOUD_KEY > ./GC-Auth.json
   - gcloud auth activate-service-account --key-file GC-Auth.json
-  - gsutil cp gs://veruscoin/VerusCoin/$TRAVIS_BRANCH/$KOMODO_VARIANT/ ./
+  - gsutil cp -r gs://veruscoin/VerusCoin/$TRAVIS_BRANCH/$KOMODO_VARIANT/ ./
   - tar -xzvf VerusCoin_$TRAVIS_BRANCH_$KOMODO_VARIANT_komodo-build.tar
   - cp -rvf komodo-build/* assets/bin/$ASSETS_DIR
   - yarn install
