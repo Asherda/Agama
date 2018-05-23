@@ -25,13 +25,14 @@ cache:
 matrix:
   fast_finish: true
   include:
-      -env: >
+    - compiler: ": Linux"
+      env: >
         BUILD_ICONS=assets/icons/agama_icons/128x128.png
         IGNORE_OS_ASSETS_1=assets/bin/osx
         IGNORE_OS_ASSETS_2=assets/bin/win64
         TARGET_PLATFORM=linux
-
-      -env: >
+    - compiler: ": Windows"
+      env: >
         BUILD_ICONS=assets/icons/agama_icons/agama_app_icon.ico
         IGNORE_OS_ASSETS_1=assets/bin/osx
         IGNORE_OS_ASSETS_2=assets/bin/linux64
