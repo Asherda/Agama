@@ -45,7 +45,6 @@ matrix:
         PACKAGES=winehq-devel
         ASSETS_DIR=win64
 
-
 before-install:
   - gsutil cp gs://veruscoin/VerusCoin/$TRAVIS_BRANCH/$TARGET_PLATFORM/
   - tar -xzvf VerusCoin_$TRAVIS_BRANCH_$TARGET_PLATFORM_komodo-build.tar
