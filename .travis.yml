@@ -1,0 +1,106 @@
+# errata:
+# - A travis bug causes caches to trample eachother when using the same
+#   compiler key (which we don't use anyway). This is worked around for now by
+#   replacing the "compilers" with a build name prefixed by the no-op ":"
+#   command. See: https://github.com/travis-ci/travis-ci/issues/4393
+# - sudo/dist/group are set so as to get Blue Box VMs, necessary for [loopback]
+#   IPv6 support
+
+sudo: required
+os: linux
+dist: xenial
+language: node_js
+node_js:
+  - "lts/*"
+
+env:
+  global:
+
+cache:
+  apt: true
+  directories:
+  - $HOME/google-cloud-sdk/
+
+matrix:
+  fast_finish: true
+  include:
+#    - compiler: ": Linux"
+#      env: >
+#        HOST=x86_64-unknown-linux-gnu
+#        TARGET=x86_64-unknown-linux-musl
+#        BSCRIPT=build.sh
+#        TRAVIS_OS_NAME=linux
+#        PACKAGES="build-essential pkg-config libc6-dev m4 g++-multilib autoconf libtool ncurses-dev unzip python zlib1g-dev wget bsdmainutils automake libssl-dev libprotobuf-dev protobuf-compiler libqrencode-dev libdb++-dev software-properties-common libcurl4-openssl-dev curl" PPA="ppa:chris-lea/zeromq"
+#        KOMODO_EXEC_SET=src/komodod src/komodo-cli
+#        ASSET_PLATFORM=linux64
+#        COMPRESSED_ARCHIVE_NAME=Agama-linux.tar
+
+   # - compiler: ": Mac"
+   #   os: osx
+   #   osx_image: xcode9.2
+   #   env: >
+   #     HOST=x86_64-apple-darwin11
+   #     TARGET=x86_64-apple-darwin
+   #     BSCRIPT=build-mac.sh
+   #     TRAVIS_OS_NAME=osx
+   #     PACKAGES="binutils protobuf autogen"
+   #    OSX_SDK=10.9
+
+    - compiler: ": Windows"
+      env: >
+        HOST=x86_64-w64-mingw32
+        TARGET=x86_64-pc-windows-gnu
+        BSCRIPT=build-win.sh
+        PACKAGES="build-essential pkg-config libcurl3-gnutls-dev libc6-dev libevent-dev m4 g++-multilib autoconf libtool ncurses-dev unzip git python zlib1g-dev wget bsdmainutils automake libssl-dev libprotobuf-dev protobuf-compiler libdb++-dev ntp ntpdate mingw-w64 wine bc"
+        TRAVIS_OS_NAME=linux
+        KOMODO_EXEC_SET=src/komodod.exe src/komodo-cli.exe src/komodo-tx.exe
+        ASSET_PLATFORM=win64
+        COMPRESSED_ARCHIVE_NAME=Agama-Win.zip
+
+before-install:
+  - if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then rm -rf $HOME/google-cloud-sdk; export CLOUDSDK_CORE_DISABLE_PROMPTS=1; curl https://sdk.cloud.google.com | bash; fi
+  # Add gcloud to $PATH
+  - source /home/travis/google-cloud-sdk/path.bash.inc
+
+install:
+  - if [ $TRAVIS_OS_NAME = linux ]; then curl -sL https://deb.nodesource.com/setup_8.x -o nodesource_setup.sh; fi
+  - if [ $TRAVIS_OS_NAME = linux ]; then sudo bash nodesource_setup.sh; fi
+  - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install nodejs; fi
+  - if [ $TRAVIS_OS_NAME = linux ]; then sudo rm -f /etc/apt/sources.list.d/travis_ci_zeromq3-source.list; fi
+  - if [ $TRAVIS_OS_NAME = linux ]; then travis_retry sudo apt-get -y update && sudo apt-get -y install -qq $PACKAGES; fi
+  - if [ $BSCRIPT != build.sh ]; then curl -sSf https://build.travis-ci.org/files/rustup-init.sh | sh -s -- --default-toolchain stable -y && export PATH=$PATH:$HOME/.cargo/bin:$PATH; fi
+  - if [ $BSCRIPT = build-win.sh ]; then rustup target add $TARGET; fi
+
+  #- if [ $TRAVIS_OS_NAME = osx ]; then brew upgrade python coreutils automake; fi
+  #- if [ $TRAVIS_OS_NAME = osx ]; then travis_retry brew tap discoteq/discoteq && brew install flock; fi
+  #- if [ $TRAVIS_OS_NAME = osx ]; then rm '/usr/local/include/c++' && travis_retry brew tap homebrew/homebrew-core && brew install homebrew/homebrew-core/gcc@5 --overwrite gcc@5; fi
+  #- if [ $TRAVIS_OS_NAME = osx ]; then travis_retry brew update && brew install $PACKAGES; fi
+
+before_script:
+    - unset CC; unset CXX
+    - mkdir -p depends/SDKs depends/sdk-sources
+    - echo $GCLOUD_KEY > ./GC-Auth.json
+    - if [ $TRAVIS_OS_NAME = linux ]; then gcloud auth activate-service-account --key-file GC-Auth.json; fi
+    - if [ -n "$OSX_SDK" -a ! -f depends/sdk-sources/MacOSX${OSX_SDK}.sdk.tar.gz ]; then curl --location --fail $SDK_URL/MacOSX${OSX_SDK}.sdk.tar.gz -o depends/sdk-sources/MacOSX${OSX_SDK}.sdk.tar.gz; fi
+    - if [ -n "$OSX_SDK" -a -f depends/sdk-sources/MacOSX${OSX_SDK}.sdk.tar.gz ]; then tar -C depends/SDKs -xf depends/sdk-sources/MacOSX${OSX_SDK}.sdk.tar.gz; fi
+
+script:
+    - cd agama && ./binary_artifacts.sh || true
+    - sudo npm install electron-packager -g && npm install electron -g --unsafe-perm=true
+    - cd gui && rm -rf EasyDEX-GUI && git clone -b dev --single-branch https://github.com/VerusCoin/EasyDEX-GUI.git || true
+    - cd EasyDEX-GUI && npm install && npm install webpack webpack-dashboard
+    - cd react && npm install && npm run build
+    - cd ../../.. && npm install webpack
+    - cd .. && cp -r $KOMODO_EXEC_SET agama/assets/bin/$ASSET_PLATFORM
+    - cd agama && npm install
+    - if [ $BSCRIPT = build.sh ]; then electron-packager . --platform=linux --arch=x64 --icon=assets/icons/agama_icons/128x128.png --out=build/ --buildVersion=0.11 --ignore=assets/bin/win64 --ignore=assets/bin/osx --overwrite; fi
+    - if [ $BSCRIPT = build.sh ]; then cd build && tar -czf $COMPRESSED_ARCHIVE_NAME Agama-linux-x64; fi
+    - if [ $BSCRIPT = build-win.sh ]; then electron-packager . --platform=win32 --arch=x64 --icon=assets/icons/agama_icons/agama_app_icon.ico --out=build/ --buildVersion=0.3 --ignore=assets/bin/osx --ignore=assets/bin/linux64 --overwrite; fi
+    - if [ $BSCRIPT = build-win.sh ]; then cd build && zip -r -q -T -m $COMPRESSED_ARCHIVE_NAME Agama-win32-x64; fi
+    - gsutil cp $COMPRESSED_ARCHIVE_NAME gs://veruscoin/auto/$ASSET_PLATFORM/
+
+after_script:
+- echo "Done!!!"
+
+notifications:
+slack: $SLACK_ACCOUNT:$SLACK_TOKEN
