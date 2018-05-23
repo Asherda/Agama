@@ -58,7 +58,7 @@ before-install:
 
 install:
   - if [ -n "$PACKAGES" ]; then travis_retry sudo apt-get -y update && sudo apt-get -y install --install-recommends -qq $PACKAGES; fi
-  - cd agama && ./binary_artifacts.sh || true
+  - ./binary_artifacts.sh || true
   - yarn add electron-packager -g && yarn add electron -g --unsafe-perm=true
   - cd gui/EasyDEX-GUI && yarn install && yarn add webpack webpack-dashboard
   - cd react && yarn install && yarn run build
