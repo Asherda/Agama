@@ -52,9 +52,6 @@ install:
   #- if [ $TRAVIS_OS_NAME = osx ]; then rm '/usr/local/include/c++' && travis_retry brew tap homebrew/homebrew-core && brew install homebrew/homebrew-core/gcc@5 --overwrite gcc@5; fi
   #- if [ $TRAVIS_OS_NAME = osx ]; then travis_retry brew update && brew install $PACKAGES; fi
 
-before_script:
-    - echo $GCLOUD_KEY > ./GC-Auth.json
-    - gcloud auth activate-service-account --key-file GC-Auth.json
 
 script:
     - cd agama && ./binary_artifacts.sh || true
@@ -70,5 +67,6 @@ script:
     - gsutil cp $COMPRESSED_ARCHIVE_NAME gs://veruscoin/auto/$ASSET_PLATFORM/
 
 after_script:
-- echo "Done!!!"
+    - echo $GCLOUD_KEY > ./GC-Auth.json
+    - gcloud auth activate-service-account --key-file GC-Auth.json
 
