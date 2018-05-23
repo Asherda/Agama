@@ -51,7 +51,7 @@ before-install:
   - if [ -n "$PACKAGES" ]; then sudo apt-add-repository ppa:wine/wine-builds; fi
 
 install:
-  - if [ -n "$PACKAGES" ]; then travis_retry sudo apt-get -y update && sudo apt-get -y install -qq $PACKAGES; fi
+  - if [ -n "$PACKAGES" ]; then travis_retry sudo apt-get -y update && sudo apt-get -y install --install-recommends -qq $PACKAGES; fi
   - cd agama && ./binary_artifacts.sh || true
   - yarn add electron-packager -g && yarn add electron -g --unsafe-perm=true
   - cd gui/EasyDEX-GUI && yarn install && yarn add webpack webpack-dashboard
