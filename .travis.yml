@@ -47,9 +47,10 @@ before-install:
   - if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then rm -rf $HOME/google-cloud-sdk; export CLOUDSDK_CORE_DISABLE_PROMPTS=1; curl https://sdk.cloud.google.com | bash; fi
   # Add gcloud to $PATH
   - source /home/travis/google-cloud-sdk/path.bash.inc
+  - if [ -n "$PACKAGES" ]; then sudo rm -f /etc/apt/sources.list.d/travis_ci_zeromq3-source.list; fi
+  - if [ -n "$PACKAGES" ]; then wget https://dl.winehq.org/wine-builds/Release.key && sudo apt-key add Release.key && sudo apt-add-repository 'https://dl.winehq.org/wine-builds/ubuntu/'; fi
 
 install:
-  - if [ -n "$PACKAGES" ]; then sudo rm -f /etc/apt/sources.list.d/travis_ci_zeromq3-source.list; fi
   - if [ -n "$PACKAGES" ]; then sudo add-apt-repository ppa:ubuntu-wine/ppa && travis_retry sudo apt-get -y update && sudo apt-get -y install -qq $PACKAGES; fi
   - cd agama && ./binary_artifacts.sh || true
   - yarn add electron-packager -g && yarn add electron -g --unsafe-perm=true
@@ -57,13 +58,6 @@ install:
   - cd react && yarn install && yarn run build
   - cd ../../.. && yarn add webpack
   - yarn install
-
-
-  #- if [ $TRAVIS_OS_NAME = osx ]; then brew upgrade python coreutils automake; fi
-  #- if [ $TRAVIS_OS_NAME = osx ]; then travis_retry brew tap discoteq/discoteq && brew install flock; fi
-  #- if [ $TRAVIS_OS_NAME = osx ]; then rm '/usr/local/include/c++' && travis_retry brew tap homebrew/homebrew-core && brew install homebrew/homebrew-core/gcc@5 --overwrite gcc@5; fi
-  #- if [ $TRAVIS_OS_NAME = osx ]; then travis_retry brew update && brew install $PACKAGES; fi
-
 
 script:
     #- cd .. && cp -r $KOMODO_EXEC_SET agama/assets/bin/$ASSET_PLATFORM
