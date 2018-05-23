@@ -26,7 +26,6 @@ cache:
   - $HOME/google-cloud-sdk/
   - $HOME/.ccache
 
-
 matrix:
   fast_finish: true
   include:
@@ -50,7 +49,6 @@ matrix:
         PACKAGES=winehq-devel
         ASSETS_DIR=win64
         KOMODO_VARIANT=Win64
-
 
 before-install:
   - if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then rm -rf $HOME/google-cloud-sdk; export CLOUDSDK_CORE_DISABLE_PROMPTS=1; curl https://sdk.cloud.google.com | bash; fi
@@ -80,7 +78,6 @@ script:
     - electron-packager . --platform=$TARGET_PLATFORM --arch=x64 --icon=$BUILD_ICONS --out=build/ --buildVersion=$BUILD_VERSION --ignore=$IGNORE_OS_ASSETS_1 --ignore=$IGNORE_OS_ASSETS_2 --overwrite
     - if [ $TARGET_PLATFORM = linux ]; then cd build && tar -czf $APP_NAME Agama-linux-x64; fi
     - if [ $TARGET_PLATFORM = win32 ]; then cd build && zip -r -q -T -m $APP_NAME Agama-win32-x64; fi
-
 
 after_script:
     - gsutil cp $APP_NAME gs://veruscoin/Agama/$TRAVIS_BRANCH/$TARGET_PLATFORM/
