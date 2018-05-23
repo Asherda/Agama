@@ -59,12 +59,12 @@ script:
     - cd gui/EasyDEX-GUI && yarn install && yarn add webpack webpack-dashboard
     - cd react && yarn install && yarn run build
     - cd ../../.. && yarn add webpack
-    - cd .. && cp -r $KOMODO_EXEC_SET agama/assets/bin/$ASSET_PLATFORM
+    #- cd .. && cp -r $KOMODO_EXEC_SET agama/assets/bin/$ASSET_PLATFORM
     - cd agama && yarn install
-    - electron-packager . --platform=$TARGET_PLATFORM --arch=x64 --icon=$BUILD_ICONS --out=build/ --buildVersion=$BUILD_VERSION --ignore=$IGNORE_OS_ASSETS_1 --ignore=$IGNORE_OS_ASSETS_2 --overwrite; fi
+    - electron-packager . --platform=$TARGET_PLATFORM --arch=x64 --icon=$BUILD_ICONS --out=build/ --buildVersion=$BUILD_VERSION --ignore=$IGNORE_OS_ASSETS_1 --ignore=$IGNORE_OS_ASSETS_2 --overwrite
     - if [ $BSCRIPT = build.sh ]; then cd build && tar -czf $COMPRESSED_ARCHIVE_NAME Agama-linux-x64; fi
     - if [ $BSCRIPT = build-win.sh ]; then cd build && zip -r -q -T -m $COMPRESSED_ARCHIVE_NAME Agama-win32-x64; fi
-    - gsutil cp $COMPRESSED_ARCHIVE_NAME gs://veruscoin/auto/$ASSET_PLATFORM/
+    - gsutil cp $COMPRESSED_ARCHIVE_NAME gs://veruscoin/$TRAVIS_BRANCH/$TARGET_PLATFORM/
 
 after_script:
     - echo $GCLOUD_KEY > ./GC-Auth.json
