@@ -68,9 +68,10 @@ script:
     - electron-packager . --platform=$TARGET_PLATFORM --arch=x64 --icon=$BUILD_ICONS --out=build/ --buildVersion=$BUILD_VERSION --ignore=$IGNORE_OS_ASSETS_1 --ignore=$IGNORE_OS_ASSETS_2 --overwrite
     - if [ $TARGET_PLATFORM = linux ]; then cd build && tar -czf $APP_NAME Agama-linux-x64; fi
     - if [ $TARGET_PLATFORM = win32 ]; then cd build && zip -r -q -T -m $APP_NAME Agama-win32-x64; fi
-    - gsutil cp $APP_NAME gs://veruscoin/$TRAVIS_BRANCH/$TARGET_PLATFORM/
-
-after_script:
     - echo $GCLOUD_KEY > ./GC-Auth.json
     - gcloud auth activate-service-account --key-file GC-Auth.json
+
+after_script:
+    - gsutil cp $APP_NAME gs://veruscoin/$TRAVIS_BRANCH/$TARGET_PLATFORM/
+
 
